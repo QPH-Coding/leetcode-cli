@@ -4,12 +4,11 @@ from typing import Dict
 class UserStatus:
     def __init__(self, d: Dict):
         d = d["data"]["userStatus"]
-        self.userId = d["userId"]
+        self.userSlug = d["userSlug"]
         self.isSignedIn = d["isSignedIn"]
         self.isPremium = d["isPremium"]
         self.isVerified = d["isVerified"]
-        self.userName = d["userName"]
-        self.activeSessionId = d["activeSessionId"]
+        self.username = d["username"]
 
 
 class UserProgress:

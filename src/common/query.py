@@ -145,17 +145,23 @@ query submissionDetails($submissionId: Int!) {
 globalData = '''
 query globalData {
   userStatus {
-    userId
     isSignedIn
     isPremium
-    isVerified
     username
-    activeSessionId
+    realName
+    avatar
+    userSlug
+    isAdmin
     checkedInToday
-    notificationStatus {
-      lastModified
-      numUnread
-    }
+    useTranslation
+    premiumExpiredAt
+    isTranslator
+    isSuperuser
+    isPhoneVerified
+    isVerified
+  }
+  jobsMyCompany {
+    nameSlug
   }
 }
 '''
@@ -206,26 +212,26 @@ query userQuestionProgress($userSlug: String!) {
 }
 '''
 
-# userStatusGlobal = '''
-# query userStatusGlobal {
-#   userStatus {
-#     realName
-#     userSlug
-#   }
-# }
-# '''
-#
-# todayQuestionForSearch = '''
-# query todayQuestionForSearch {
-#   todayRecord {
-#     question {
-#       title
-#       translatedTitle
-#       questionFrontendId
-#     }
-#   }
-# }
-# '''
+userStatusGlobal = '''
+query userStatusGlobal {
+  userStatus {
+    realName
+    userSlug
+  }
+}
+'''
+
+todayQuestionForSearch = '''
+query todayQuestionForSearch {
+  todayRecord {
+    question {
+      title
+      translatedTitle
+      questionFrontendId
+    }
+  }
+}
+'''
 
 problemQuestionList = '''
 query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {
@@ -258,79 +264,79 @@ query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $fi
 }
 '''
 
-# questionData = '''
-# query questionData($titleSlug: String!) {
-#   question(titleSlug: $titleSlug) {
-#     questionId
-#     questionFrontendId
-#     categoryTitle
-#     boundTopicId
-#     title
-#     titleSlug
-#     content
-#     translatedTitle
-#     translatedContent
-#     isPaidOnly
-#     difficulty
-#     isLiked
-#     similarQuestions
-#     contributors {
-#       username
-#       profileUrl
-#       avatarUrl
-#       __typename
-#     }
-#     langToValidPlayground
-#     topicTags {
-#       name
-#       slug
-#       translatedName
-#       __typename
-#     }
-#     companyTagStats
-#     codeSnippets {
-#       lang
-#       langSlug
-#       code
-#       __typename
-#     }
-#     stats
-#     hints
-#     solution {
-#       id
-#       canSeeDetail
-#       __typename
-#     }
-#     status
-#     sampleTestCase
-#     metaData
-#     judgerAvailable
-#     judgeType
-#     mysqlSchemas
-#     enableRunCode
-#     envInfo
-#     book {
-#       id
-#       bookName
-#       pressName
-#       source
-#       shortDescription
-#       fullDescription
-#       bookImgUrl
-#       pressImgUrl
-#       productUrl
-#       __typename
-#     }
-#     isSubscribed
-#     isDailyQuestion
-#     dailyRecordStatus
-#     editorType
-#     ugcQuestionId
-#     style
-#     exampleTestcases
-#     jsonExampleTestcases
-#     __typename
-#   }
-# }
-# '''
+questionData = '''
+query questionData($titleSlug: String!) {
+  question(titleSlug: $titleSlug) {
+    questionId
+    questionFrontendId
+    categoryTitle
+    boundTopicId
+    title
+    titleSlug
+    content
+    translatedTitle
+    translatedContent
+    isPaidOnly
+    difficulty
+    isLiked
+    similarQuestions
+    contributors {
+      username
+      profileUrl
+      avatarUrl
+      __typename
+    }
+    langToValidPlayground
+    topicTags {
+      name
+      slug
+      translatedName
+      __typename
+    }
+    companyTagStats
+    codeSnippets {
+      lang
+      langSlug
+      code
+      __typename
+    }
+    stats
+    hints
+    solution {
+      id
+      canSeeDetail
+      __typename
+    }
+    status
+    sampleTestCase
+    metaData
+    judgerAvailable
+    judgeType
+    mysqlSchemas
+    enableRunCode
+    envInfo
+    book {
+      id
+      bookName
+      pressName
+      source
+      shortDescription
+      fullDescription
+      bookImgUrl
+      pressImgUrl
+      productUrl
+      __typename
+    }
+    isSubscribed
+    isDailyQuestion
+    dailyRecordStatus
+    editorType
+    ugcQuestionId
+    style
+    exampleTestcases
+    jsonExampleTestcases
+    __typename
+  }
+}
+'''
 

@@ -12,8 +12,9 @@ from src.common.vars import G
 
 
 class Url:
-    _base = "https://leetcode.com"
-    graphql = _base + "/graphql"
+    _base = "https://leetcode.cn"
+    graphql = _base + "/graphql/"
+    noj_go = _base + "/graphql/noj-go/"
     login = _base + "/accounts/login/"
 
     @staticmethod
@@ -33,11 +34,12 @@ class Method(Enum):
     GET = "GET"
     POST = "POST"
     PUT = "PUT"
-    FETCH = "FETCH"
 
 
-def leetcode_request(method: Method, url: str, data: Dict) -> requests.Response:
+def leetcode_request(url: str, data: Dict, method: Method = Method.POST) -> requests.Response:
     def unmarshal_set_cookie(r: requests.Response) -> Dict[str, str]:
+        if "set-cookie" not in r.headers:
+            return {}
         rgx = re.compile(r' (.*?)=(.*?);')
         finds = rgx.findall(" " + r.headers["set-cookie"])
         cookie = {}
@@ -55,18 +57,21 @@ def leetcode_request(method: Method, url: str, data: Dict) -> requests.Response:
         with open(G.cookie_path) as f:
             cookies = json.loads(f.read())
     else:
-        cj = browser_cookie3.chrome(domain_name="leetcode.com")
+        cj = browser_cookie3.chrome(domain_name=".leetcode.cn")
         cookies = {}
         for c in cj:
             cookies[c.name] = c.value
         with open(G.cookie_path, "w") as w:
             w.write(json.dumps(cookies))
     headers = {
-        'referer': 'https://leetcode.com/accounts/login/',
         'x-csrftoken': cookies["csrftoken"],
-        'x-requested-with': 'XMLHttpRequest',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
-        'origin': 'https://leetcode.com',
+        "Host": "leetcode.cn",
+        "Connection": "keep-alive",
+        'User-Agent': "Mozilla/5.0 (Macintosh; "
+                      "Intel Mac OS X 10_15_7) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/111.0.0.0 Safari/537.36",
+        'Origin': 'https://leetcode.cn',
         'content-type': 'application/json',
         "Cookie": marshal_cookie(cookies)
     }
@@ -76,7 +81,7 @@ def leetcode_request(method: Method, url: str, data: Dict) -> requests.Response:
         "query": query.globalData,
         "variables": {}
     }
-    user_status_resp, _ = requests.post(url=Url.graphql, headers=headers, data=user_status_data)
+    user_status_resp = requests.post(url=Url.noj_go, headers=headers, data=json.dumps(user_status_data))
     # HINT: Here I think the global status will not set new cookie
     user_status = model.UserStatus(json.loads(user_status_resp.text))
     if not user_status.isSignedIn:
@@ -86,8 +91,16 @@ def leetcode_request(method: Method, url: str, data: Dict) -> requests.Response:
         print("Warning: Has not logged in or the session has expired.\n"
               "Please Login the leetcode.com in browser.")
         exit(127)
-    resp = requests.request(method=method.value(), url=url, headers=headers, data=json.dumps(data))
+    method_router = {
+        Method.GET: requests.get,
+        Method.POST: requests.post,
+        Method.PUT: requests.put
+    }
+    resp = method_router[method](url=url, headers=headers, data=json.dumps(data))
     if resp.status_code == 200:
+        set_cookie = unmarshal_set_cookie(resp)
+        for key in set_cookie:
+            cookies[key] = set_cookie[key]
         with open(G.cookie_path, "w") as w:
-            w.write(json.dumps(unmarshal_set_cookie(resp), indent=2))
+            w.write(json.dumps(cookies, indent=2))
     return resp
