@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import argparse
+
+from src.common import lang
+from src.main import main
+
+
+def _bootstrap():
+    def config_bootstrap():
+        config.add_argument("-l", "--lang", choices=lang.lang_list, help="Config prefer language")
+
+    def user_bootstrap():
+        pass
+
+    def problem_bootstrap():
+        problem_subparser = problem.add_subparsers(dest="action", title="action")
+        problem_pull = problem_subparser.add_parser("pull", help="Pull the problem snippet and description as .md")
+        problem_pull.add_argument("frontend_id", type=str,
+                                  help="Specify a problem by frontend id. Such as: '1'、'剑指 Offer II 049'")
+        problem_pull.add_argument("-l", "--lang", choices=lang.lang_list, default="cpp",
+                                  help="Default: cpp. The snippet language: "
+                                       "cpp,c,python,python3,golang,rust,java,javascript,csharp,swift,scala...")
+        problem_subparser.add_parser("update", help="Update the dataset of problem")
+        problem_submit = problem_subparser.add_parser("submit",
+                                                      help="Submit the file with the comment made by leetcode-cli")
+        problem_submit.add_argument("file", type=str)
+        problem_subparser.add_parser("today", help="Pull the today problem")
+
+    def submission_bootstrap():
+        submission_subparser = submission.add_subparsers(dest="action", title="action")
+        submission_list = submission_subparser.add_parser("list", help="List submission")
+        submission_list.add_argument("frontend_id", type=str, help="Specify a problem by frontend id")
+        submission_detail = submission_subparser.add_parser("detail", help="Show submission detail")
+        submission_detail.add_argument("frontend_id", type=str, help="Specify a problem by frontend id")
+
+    parser = argparse.ArgumentParser("leetcode-cli")
+    subparser = parser.add_subparsers(dest="type", title="type")
+
+    config = subparser.add_parser("config", help="Config leetcode-cli")
+    config_bootstrap()
+    user = subparser.add_parser("user", help="Show the basic user message to check work status")
+    user_bootstrap()
+    problem = subparser.add_parser("problem", help="List problems")
+    problem_bootstrap()
+    submission = subparser.add_parser("submission", help="Submission")
+    submission_bootstrap()
+
+    args = vars(parser.parse_args())
+    print(args)
+    return args
+
+
+if __name__ == '__main__':
+    main(_bootstrap())
