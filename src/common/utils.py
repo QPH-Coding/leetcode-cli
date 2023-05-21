@@ -52,7 +52,7 @@ def find_problem_info(path: str, frontend_id: str) -> Tuple[ProblemInfo, bool]:
             info.filename = "%s-%s(%s)" % (frontend_id, info.title, problem["titleCn"])
             print("Found: %s %s %6s %s" % (info.frontend_id, info.title, info.difficulty, info.ac_rate))
             break
-        if fuzz.partial_ratio(frontend_id, info.frontend_id) > 65:
+        if fuzz.partial_ratio(frontend_id, info.frontend_id) > 80:
             similar.append("Frontend id: %8s, Name: %s" % (info.frontend_id, info.title))
     if not info.slug:
         print("Problem not found in dataset")
